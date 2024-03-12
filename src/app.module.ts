@@ -33,7 +33,6 @@ import { RunnerPokeApiContestController } from './runner/pokeapi/contest/runner.
       transports: [
         new winston.transports.Console({
           format: winston.format.combine(
-            winston.format.timestamp(),
             winston.format.ms(),
             nestWinstonModuleUtilities.format.nestLike('CLI Test', {
               colors: true,

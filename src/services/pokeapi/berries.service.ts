@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, map } from 'rxjs';
 import { Log } from 'src/log/logging';
 import { faker } from '@faker-js/faker';
+import { Verbose } from 'src/cli/commands/tests-api.command';
 
 @Injectable()
 export class PokeApiBerriesService {
@@ -13,7 +14,7 @@ export class PokeApiBerriesService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getBerry() {
+  async getBerry(verbose: string) {
     const berry: number = faker.number.int({ min: 1, max: 64 });
     const url = `${this.configService.get<string>('berriesService.getBerry')}${berry}`;
     const startTime = Date.now();
@@ -29,6 +30,7 @@ export class PokeApiBerriesService {
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -42,12 +44,13 @@ export class PokeApiBerriesService {
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );
   }
 
-  async getBerryFirmnesses() {
+  async getBerryFirmnesses(verbose: string) {
     const berry: number = faker.number.int({ min: 1, max: 5 });
     const url = `${this.configService.get<string>('berriesService.getBerryFirmnesses')}${berry}`;
     const startTime = Date.now();
@@ -59,10 +62,11 @@ export class PokeApiBerriesService {
           return this.logger.request(
             response,
             ms,
-            '/pokeapi/berry/getBerry',
+            '/pokeapi/berry/getBerryFirmnesses',
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -72,16 +76,17 @@ export class PokeApiBerriesService {
           return this.logger.request(
             error,
             ms,
-            '/pokeapi/berry/getBerry',
+            '/pokeapi/berry/getBerryFirmnesses',
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );
   }
 
-  async getBerryFlavors() {
+  async getBerryFlavors(verbose: string) {
     const berry: number = faker.number.int({ min: 1, max: 5 });
     const url = `${this.configService.get<string>('berriesService.getBerryFlavors')}${berry}`;
     const startTime = Date.now();
@@ -93,10 +98,11 @@ export class PokeApiBerriesService {
           return this.logger.request(
             response,
             ms,
-            '/pokeapi/berry/getBerry',
+            '/pokeapi/berry/getBerryFlavors',
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -106,10 +112,11 @@ export class PokeApiBerriesService {
           return this.logger.request(
             error,
             ms,
-            '/pokeapi/berry/getBerry',
+            '/pokeapi/berry/getBerryFlavors',
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );

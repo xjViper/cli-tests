@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PokeApiBerriesService } from 'src/services/pokeapi/berries.service';
 import { PokeApiContestService } from 'src/services/pokeapi/contest.service';
 
@@ -10,32 +10,32 @@ export class PokeApiController {
   ) {}
 
   @Get('berry/getBerry')
-  async getBerry() {
-    return await this.berries.getBerry();
+  async getBerry(@Query('verbose') verbose: string) {
+    return await this.berries.getBerry(verbose);
   }
 
   @Get('berry/getBerryFirmnesses')
-  async getBerryFirmnesses() {
-    return await this.berries.getBerryFirmnesses();
+  async getBerryFirmnesses(@Query('verbose') verbose: string) {
+    return await this.berries.getBerryFirmnesses(verbose);
   }
 
   @Get('berry/getBerryFlavors')
-  async getBerryFlavors() {
-    return await this.berries.getBerryFlavors();
+  async getBerryFlavors(@Query('verbose') verbose: string) {
+    return await this.berries.getBerryFlavors(verbose);
   }
 
   @Get('contest/getContest')
-  async getContest() {
-    return await this.contest.getContest();
+  async getContest(@Query('verbose') verbose: string) {
+    return await this.contest.getContest(verbose);
   }
 
   @Get('contest/getContestEffect')
-  async getContestEffect() {
-    return await this.contest.getContestEffect();
+  async getContestEffect(@Query('verbose') verbose: string) {
+    return await this.contest.getContestEffect(verbose);
   }
 
   @Get('contest/getSuperContestEffect')
-  async getSuperContestEffect() {
-    return await this.contest.getSuperContestEffect();
+  async getSuperContestEffect(@Query('verbose') verbose: string) {
+    return await this.contest.getSuperContestEffect(verbose);
   }
 }

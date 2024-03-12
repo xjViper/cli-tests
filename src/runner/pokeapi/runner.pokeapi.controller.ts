@@ -8,44 +8,50 @@ import { RunnerPokeApiContestController } from './contest/runner.pokeapi.contest
 @Controller('runnerPokeApi')
 export class RunnerPokeApiController {
   constructor(
-    private readonly runnerPokeApiBerries: RunnerPokeApiBerryController,
-    private readonly runnerPokeApiContest: RunnerPokeApiContestController,
+    private readonly berries: RunnerPokeApiBerryController,
+    private readonly contest: RunnerPokeApiContestController,
     private colors: Colors,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly runnerLogger: Logger,
   ) {}
 
-  async pokeApiTestCase(
+  async testCase(
     module: string,
     test: string,
     delay: number,
     testIndex: number,
     testCases: number,
+    verbose: string,
   ) {
     switch (module) {
       case 'berry':
-        await this.runnerPokeApiBerries.pokeApiBerryTestCases(
+        await this.berries.testCases(
           test,
           delay,
           testIndex,
           testCases,
+          verbose,
         );
         break;
       case 'contest':
-        await this.runnerPokeApiContest.pokeApiContestTestCases(
+        await this.contest.testCases(
           test,
           delay,
           testIndex,
           testCases,
+          verbose,
         );
         break;
       default:
-        await this.cliRunner(delay);
+        await this.run(delay, verbose);
         break;
     }
   }
 
   @Post('cli')
-  async cliRunner(@Query('delay', ParseIntPipe) delay: number) {
+  async run(
+    @Query('delay', ParseIntPipe) delay: number,
+    @Query('verbose') verbose: string,
+  ) {
     this.runnerLogger.info(
       `${this.colors.selectColor(
         'POKEAPI_RGB',
@@ -59,21 +65,19 @@ export class RunnerPokeApiController {
       )}`,
     );
 
-    const berries = await this.runnerPokeApiBerries.pokeApiBerryRunner(delay);
+    const berries = await this.berries.run(delay, verbose);
 
-    const contest = await this.runnerPokeApiContest.pokeApiContestRunner(delay);
+    const contest = await this.contest.run(delay, verbose);
 
-    const pokeApiSuccess =
-      berries.pokeApiBerriesSuccess + contest.pokeApiContestSuccess;
+    const success = berries.success + contest.success;
 
-    const pokeApiFailed =
-      berries.pokeApiBerriesFailed + contest.pokeApiContestFailed;
+    const failed = berries.failed + contest.failed;
 
     this.runnerLogger.info(
       `${this.colors.selectColor(
         'POKEAPI_RGB',
         'Poke Api',
-      )} ${this.colors.total(pokeApiSuccess, pokeApiFailed)}`,
+      )} ${this.colors.total(success, failed)}`,
     );
 
     this.runnerLogger.info(

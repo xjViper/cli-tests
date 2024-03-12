@@ -13,7 +13,7 @@ export class PokeApiContestService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getContest() {
+  async getContest(verbose: string) {
     const contest: number = faker.number.int({ min: 1, max: 5 });
     const url = `${this.configService.get<string>('contestService.getContest')}${contest}`;
     const startTime = Date.now();
@@ -29,6 +29,7 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -42,12 +43,13 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );
   }
 
-  async getContestEffect() {
+  async getContestEffect(verbose: string) {
     const contest: number = faker.number.int({ min: 1, max: 33 });
     const url = `${this.configService.get<string>('contestService.getContestEffect')}${contest}`;
     const startTime = Date.now();
@@ -63,6 +65,7 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -76,12 +79,13 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );
   }
 
-  async getSuperContestEffect() {
+  async getSuperContestEffect(verbose: string) {
     const contest: number = faker.number.int({ min: 1, max: 22 });
     const url = `${this.configService.get<string>('contestService.getSuperContestEffect')}${contest}`;
     const startTime = Date.now();
@@ -97,6 +101,7 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             true,
+            verbose,
           );
         }),
       )
@@ -110,6 +115,7 @@ export class PokeApiContestService {
             'POKE_API',
             HttpStatus.OK,
             false,
+            verbose,
           );
         }),
       );

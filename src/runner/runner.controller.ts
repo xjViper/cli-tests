@@ -13,11 +13,11 @@ export class RunnerController {
   ) {}
 
   @Post()
-  async runAll(@Query('delay', ParseIntPipe) delay: number) {
-    await this.pokeapi.cliRunner(delay);
+  async runAll(@Query('delay', ParseIntPipe) delay: number, verbose: string) {
+    await this.pokeapi.run(delay, verbose);
   }
 
-  async runTestCase(param: string | string[], delay: number) {
+  async runTestCase(param: string | string[], delay: number, verbose: string) {
     const testCases = param.toString().split(',');
 
     for (let testIndex: number = 0; testIndex < testCases.length; testIndex++) {
@@ -36,12 +36,14 @@ export class RunnerController {
       switch (service) {
         case 'pokeApi':
         case 'PokeApi':
-          await this.pokeapi.pokeApiTestCase(
+        case 'pokeapi':
+          await this.pokeapi.testCase(
             module,
             test,
             delay,
             testIndex,
             testCases.length,
+            verbose,
           );
           break;
         default:
@@ -49,12 +51,13 @@ export class RunnerController {
             `Unrecognized { ${testCases[testIndex]} } test. Please, select a correct test case to run.`,
           );
           this.runnerLogger.warn('Running all tests...');
-          await this.pokeapi.pokeApiTestCase(
+          await this.pokeapi.testCase(
             module,
             test,
             delay,
             testIndex,
             testCases.length,
+            verbose,
           );
           break;
       }

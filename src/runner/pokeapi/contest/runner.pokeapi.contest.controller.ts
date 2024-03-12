@@ -1,4 +1,4 @@
-import { Controller, Query, ParseIntPipe, Inject } from '@nestjs/common';
+import { Controller, Inject } from '@nestjs/common';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { lastValueFrom } from 'rxjs';
 import { PokeApiController } from 'src/controllers/pokeapi.controller';
@@ -13,63 +13,61 @@ export class RunnerPokeApiContestController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly runnerLogger: Logger,
   ) {}
 
-  private testCases = {
-    getContest: async () => lastValueFrom(await this.pokeapi.getContest()),
-    getContestEffect: async () =>
-      lastValueFrom(await this.pokeapi.getContestEffect()),
-    getSuperContestEffect: async () =>
-      lastValueFrom(await this.pokeapi.getSuperContestEffect()),
+  private tests = {
+    getContest: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getContest(verbose)),
+    getContestEffect: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getContestEffect(verbose)),
+    getSuperContestEffect: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getSuperContestEffect(verbose)),
   };
 
-  async pokeApiContestTestCases(
+  async testCases(
     test: string,
     delay: number,
     testIndex: number,
     testCases: number,
+    verbose: string,
   ) {
-    if (!this.testCases[test]) {
-      await this.pokeApiContestRunner(delay);
+    if (!this.tests[test]) {
+      await this.run(delay, verbose);
     } else {
-      await this.testCases[test];
+      await this.tests[test](verbose);
       if (testIndex !== testCases - 1) {
         await this.colors.delay(+delay);
       }
     }
   }
 
-  async pokeApiContestRunner(@Query('delay', ParseIntPipe) delay: number) {
+  async run(delay: number, verbose: string) {
     this.runnerLogger.info(
       `${this.colors.start()} ${this.colors.selectColor(
         'POKEAPI_CONTEST',
         'Poke Api Contest Tests',
       )}`,
     );
-    let pokeApiContestSuccess = 0;
-    let pokeApiContestFailed = 0;
+    let success = 0;
+    let failed = 0;
 
     await this.colors.delay(+delay / 4);
-    const getContest = await lastValueFrom(await this.pokeapi.getContest());
-    !getContest.context.success
-      ? pokeApiContestFailed++
-      : pokeApiContestSuccess++;
+    const getContest = await lastValueFrom(
+      await this.pokeapi.getContest(verbose),
+    );
+    !getContest.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay);
 
     const getContestEffect = await lastValueFrom(
-      await this.pokeapi.getContestEffect(),
+      await this.pokeapi.getContestEffect(verbose),
     );
-    !getContestEffect.context.success
-      ? pokeApiContestFailed++
-      : pokeApiContestSuccess++;
+    !getContestEffect.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay);
 
     const getSuperContestEffect = await lastValueFrom(
-      await this.pokeapi.getSuperContestEffect(),
+      await this.pokeapi.getSuperContestEffect(verbose),
     );
-    !getSuperContestEffect.context.success
-      ? pokeApiContestFailed++
-      : pokeApiContestSuccess++;
+    !getSuperContestEffect.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay / 4);
 
@@ -77,13 +75,13 @@ export class RunnerPokeApiContestController {
       `${this.colors.selectColor(
         'POKEAPI_CONTEST',
         'Poke Api Contest',
-      )} ${this.colors.total(pokeApiContestSuccess, pokeApiContestFailed)}`,
+      )} ${this.colors.total(success, failed)}`,
     );
 
     this.runnerLogger.info(
       `${this.colors.end()} ${this.colors.selectColor(
         'POKEAPI_CONTEST',
-        'Poke Api Contest Canary Tests',
+        'Poke Api Contest Tests',
       )}`,
     );
     this.runnerLogger.info(
@@ -93,6 +91,6 @@ export class RunnerPokeApiContestController {
       )}`,
     );
 
-    return { pokeApiContestSuccess, pokeApiContestFailed };
+    return { success, failed };
   }
 }

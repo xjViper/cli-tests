@@ -13,63 +13,59 @@ export class RunnerPokeApiBerryController {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly runnerLogger: Logger,
   ) {}
 
-  private testCases = {
-    getBerry: async () => lastValueFrom(await this.pokeapi.getBerry()),
-    getBerryFirmnesses: async () =>
-      lastValueFrom(await this.pokeapi.getBerryFirmnesses()),
-    getBerryFlavors: async () =>
-      lastValueFrom(await this.pokeapi.getBerryFlavors()),
+  private tests = {
+    getBerry: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getBerry(verbose)),
+    getBerryFirmnesses: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getBerryFirmnesses(verbose)),
+    getBerryFlavors: async (verbose: string) =>
+      lastValueFrom(await this.pokeapi.getBerryFlavors(verbose)),
   };
 
-  async pokeApiBerryTestCases(
+  async testCases(
     test: string,
     delay: number,
     testIndex: number,
     testCases: number,
+    verbose: string,
   ) {
-    if (!this.testCases[test]) {
-      await this.pokeApiBerryRunner(delay);
+    if (!this.tests[test]) {
+      await this.run(delay, verbose);
     } else {
-      await this.testCases[test];
+      await this.tests[test](verbose);
       if (testIndex !== testCases - 1) {
         await this.colors.delay(+delay);
       }
     }
   }
 
-  async pokeApiBerryRunner(@Query('delay', ParseIntPipe) delay: number) {
+  async run(delay: number, verbose: string) {
     this.runnerLogger.info(
       `${this.colors.start()} ${this.colors.selectColor(
         'POKEAPI_BERRY',
         'Poke Api Berries Tests',
       )}`,
     );
-    let pokeApiBerriesSuccess = 0;
-    let pokeApiBerriesFailed = 0;
+    let success = 0;
+    let failed = 0;
 
     await this.colors.delay(+delay / 4);
-    const getBerry = await lastValueFrom(await this.pokeapi.getBerry());
-    !getBerry.context.success
-      ? pokeApiBerriesFailed++
-      : pokeApiBerriesSuccess++;
+    const getBerry = await lastValueFrom(await this.pokeapi.getBerry(verbose));
+    !getBerry.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay);
 
     const getBerryFirmnesses = await lastValueFrom(
-      await this.pokeapi.getBerryFirmnesses(),
+      await this.pokeapi.getBerryFirmnesses(verbose),
     );
-    !getBerryFirmnesses.context.success
-      ? pokeApiBerriesFailed++
-      : pokeApiBerriesSuccess++;
+    !getBerryFirmnesses.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay);
 
     const getBerryFlavors = await lastValueFrom(
-      await this.pokeapi.getBerryFlavors(),
+      await this.pokeapi.getBerryFlavors(verbose),
     );
-    !getBerryFlavors.context.success
-      ? pokeApiBerriesFailed++
-      : pokeApiBerriesSuccess++;
+    !getBerryFlavors.context.success ? failed++ : success++;
 
     await this.colors.delay(+delay / 4);
 
@@ -77,13 +73,13 @@ export class RunnerPokeApiBerryController {
       `${this.colors.selectColor(
         'POKEAPI_BERRY',
         'Poke Api Berry',
-      )} ${this.colors.total(pokeApiBerriesSuccess, pokeApiBerriesFailed)}`,
+      )} ${this.colors.total(success, failed)}`,
     );
 
     this.runnerLogger.info(
       `${this.colors.end()} ${this.colors.selectColor(
         'POKEAPI_BERRY',
-        'Poke Api Berries Canary Tests',
+        'Poke Api Berries Tests',
       )}`,
     );
     this.runnerLogger.info(
@@ -93,6 +89,6 @@ export class RunnerPokeApiBerryController {
       )}`,
     );
 
-    return { pokeApiBerriesSuccess, pokeApiBerriesFailed };
+    return { success, failed };
   }
 }
