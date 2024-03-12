@@ -40,11 +40,18 @@ $ npx tests-cli run
 
 ## Options
 
-- Delay: Delay (ms) between tests
+- Delay: (ms) between tests
+   - Default: 2000 ms
+   - Flag '-d'
 - Frequency: How many times will the test be performed on a single command
+   - Default: 1 time
+   - Flag '-f'
 - Test Cases: Choose which tests will be performed based on the test route
-  - /pokeApi/berry: It will only run the tests of berries
+  - /pokeapi/berry: It will only run the tests of berries
+  - Default: All tests
+  - Flag: '-tc'
 - Verbose: Which logs will be more detailed in the output.
+  - Flag: '-v'
   - 0: Only error/Default;
   - 1: Only info;
   - 2: All;
